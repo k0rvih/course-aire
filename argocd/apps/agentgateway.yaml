@@ -5,12 +5,10 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "0"
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: oci://cr.agentgateway.dev/charts
+    repoURL: cr.agentgateway.dev/charts
     chart: agentgateway
     targetRevision: v1.0.1
     helm:
