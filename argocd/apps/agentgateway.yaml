@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: agentgateway-helm
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://cr.agentgateway.dev/charts
+    chart: agentgateway
+    targetRevision: v1.0.1
+    helm:
+      skipCrds: false
+      parameters:
+        - name: controller.image.pullPolicy
+          value: "Always"
+        - name: controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES
+          value: "true"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: agentgateway-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
