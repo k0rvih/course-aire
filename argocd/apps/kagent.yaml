@@ -21,6 +21,8 @@ spec:
           value: llama3.2
         - name: ui.service.type
           value: LoadBalancer
+        - name: ui.service.ports.port
+          value: 80
   destination:
     server: https://kubernetes.default.svc
     namespace: kagent
