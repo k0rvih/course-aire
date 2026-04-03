@@ -19,6 +19,8 @@ spec:
           value: ollama.agentgateway-system.svc.cluster.local:11434
         - name: providers.ollama.model
           value: llama3.2
+        - name: ui.service.type
+          value: LoadBalancer
   destination:
     server: https://kubernetes.default.svc
     namespace: kagent
