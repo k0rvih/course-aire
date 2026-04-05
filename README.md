@@ -17,6 +17,8 @@ Materials for **AI Reliability Engineering**: a local Kubernetes lab on Oracle V
 | `argocd/app-of-apps.yaml` | Root Argo CD `Application` that syncs everything under `argocd/apps/` |
 | `argocd/apps/` | One `Application` manifest per component (sync waves order dependencies) |
 | `argocd/templates/` | Raw Kubernetes YAML consumed by those apps (e.g. local-path-provisioner, Ollama/Gateway wiring) |
+| `argocd/templates/kagent-mcps/` | kagent **`MCPServers`** CRs deployed into namespace `kagent` (kmcp controller) |
+| `argocd/templates/kagent-agents/` | Custom kagent **`Agents`** CRs in namespace `kagent` |
 
 ## What Vagrant installs (VM provisioning)
 
@@ -57,6 +59,8 @@ The [app of apps](argocd/app-of-apps.yaml) points at this repo’s `argocd/apps`
 | `agentgateway-ollama` | 1 | **Gateway**, **HTTPRoute**, **AgentgatewayBackend**, and **Ollama** `Service` + **EndpointSlice** — traffic to Ollama is sent to **`192.168.56.1:11434`** (VirtualBox host; run Ollama on the host, not only inside a pod) |
 | `kagent-crds` | 2 | kagent CRDs (Helm from `ghcr.io/kagent-dev/kagent/helm`) |
 | `kagent` | 3 | **kagent** (default provider **Ollama** at `ollama.agentgateway-system.svc.cluster.local:11434`, model **llama3.2**; UI **LoadBalancer** on port 80) |
+| `kagent-mcps-servers` | 3 | Extra **MCP servers** for kagent: manifests in [`argocd/templates/kagent-mcps/`](argocd/templates/kagent-mcps/) — currently [AWS Documentation MCP Server](https://awslabs.github.io/mcp/servers/aws-documentation-mcp-server) as `MCPServer` **`aws-documentation-mcp`** (`uvx`, official AWS docs tools) |
+| `kagent-agents` | 3 | Custom **kagent agents**: manifests in [`argocd/templates/kagent-agents/`](argocd/templates/kagent-agents/) — **`aws-expert`** uses the AWS documentation MCP tools from **`aws-documentation-mcp`** |
 
 ## Prerequisites
 
@@ -148,6 +152,8 @@ kubectl get svc -n kagent
 ```
 
 Addresses should come from the same Cilium pool as other LB services (`192.168.56.20/28`).
+
+After **`kagent-agents`** syncs, the **aws-expert** agent appears in the kagent UI alongside the chart-bundled agents. The **AWS Documentation** MCP workload (`kagent-mcps-servers`) must be allowed **outbound HTTPS** so `uvx` can install the package and the server can call AWS documentation APIs.
 
 ## Teardown
 
