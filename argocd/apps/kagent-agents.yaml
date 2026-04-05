@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kagent-mcps-servers
+  name: kagent-agents
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "3"
@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/k0rvih/course-aire
     targetRevision: main
-    path: argocd/templates/kagent-mcps
+    path: argocd/templates/kagent-agents
     directory:
       recurse: true
       include: "*.yaml"

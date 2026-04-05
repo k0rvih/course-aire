@@ -5,6 +5,8 @@ kind: MCPServer
 metadata:
   name: aws-documentation-mcp
   namespace: kagent
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   timeout: 120s
   transportType: stdio

@@ -1,0 +1,32 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: aws-expert
+  namespace: kagent
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  description: AWS expert that answers using official AWS documentation (search, read, recommendations).
+  type: Declarative
+  declarative:
+    modelConfig: default-model-config
+    systemMessage: |
+      You are an AWS expert. Answer questions about AWS services, APIs, quotas, and best practices using the AWS Documentation MCP tools.
+
+      - Use search_documentation to find relevant guides, then read_documentation or read_sections for authoritative detail.
+      - Use recommend when the user has a docs URL and wants related pages.
+      - Always cite specific documentation URLs from tool output.
+      - If tools return nothing or error, say so; do not guess AWS behavior or URLs.
+      - Prefer current documented guidance over general assumptions.
+      - Format responses as Markdown with clear headings when helpful.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: MCPServer
+          name: aws-documentation-mcp
+          toolNames:
+            - read_documentation
+            - search_documentation
+            - read_sections
+            - recommend
