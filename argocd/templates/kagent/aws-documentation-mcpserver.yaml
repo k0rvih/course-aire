@@ -1,0 +1,19 @@
+# AWS Documentation MCP Server
+# Docs: https://awslabs.github.io/mcp/servers/aws-documentation-mcp-server
+apiVersion: kagent.dev/v1alpha1
+kind: MCPServer
+metadata:
+  name: aws-documentation-mcp
+  namespace: kagent
+spec:
+  timeout: 120s
+  transportType: stdio
+  stdioTransport: {}
+  deployment:
+    cmd: uvx
+    args:
+      - awslabs.aws-documentation-mcp-server@latest
+    port: 3000
+    env:
+      FASTMCP_LOG_LEVEL: ERROR
+      AWS_DOCUMENTATION_PARTITION: aws
