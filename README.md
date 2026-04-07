@@ -58,7 +58,7 @@ The [app of apps](argocd/app-of-apps.yaml) points at this repo’s `argocd/apps`
 | `agentgateway-helm` | 0 | **Agentgateway** controller (Helm, experimental Gateway API features enabled) |
 | `agentgateway-ollama` | 1 | **Gateway**, **HTTPRoute**, **AgentgatewayBackend**, and **Ollama** `Service` + **EndpointSlice** — traffic to Ollama is sent to **`192.168.56.1:11434`** (VirtualBox host; run Ollama on the host, not only inside a pod) |
 | `kagent-crds` | 2 | kagent CRDs (Helm from `ghcr.io/kagent-dev/kagent/helm`) |
-| `kagent` | 3 | **kagent** (default provider **Ollama** at `ollama.agentgateway-system.svc.cluster.local:11434`, model **llama3.2**; UI **LoadBalancer** on port 80) |
+| `kagent` | 3 | **kagent** (default provider **Ollama** at `ollama.agentgateway-system.svc.cluster.local:11434`, model **gemma4:e4b**; UI **LoadBalancer** on port 80) |
 | `kagent-mcps-servers` | 3 | Extra **MCP servers** for kagent: manifests in [`argocd/templates/kagent-mcps/`](argocd/templates/kagent-mcps/) — currently [AWS Documentation MCP Server](https://awslabs.github.io/mcp/servers/aws-documentation-mcp-server) as `MCPServer` **`aws-documentation-mcp`** (`uvx`, official AWS docs tools) |
 | `kagent-agents` | 3 | Custom **kagent agents**: manifests in [`argocd/templates/kagent-agents/`](argocd/templates/kagent-agents/) — **`aws-expert`** uses the AWS documentation MCP tools from **`aws-documentation-mcp`** |
 

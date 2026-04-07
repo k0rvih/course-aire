@@ -18,11 +18,11 @@ spec:
         - name: providers.ollama.config.host
           value: ollama.agentgateway-system.svc.cluster.local:11434
         - name: providers.ollama.model
-          value: llama3.2
+          value: gemma4:e4b
         - name: ui.service.type
           value: LoadBalancer
         - name: ui.service.ports.port
-          value: '80'
+          value: "80"
   destination:
     server: https://kubernetes.default.svc
     namespace: kagent
