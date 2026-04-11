@@ -53,7 +53,7 @@ spec:
     provider:
       openai:
         # My local model
-        model: gemma4:e4b
+        model: gemma4:26b
       host: ollama.agentgateway-system.svc.cluster.local
       port: 11434
 ---

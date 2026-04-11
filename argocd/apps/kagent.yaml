@@ -18,7 +18,7 @@ spec:
         - name: providers.ollama.config.host
           value: ollama.agentgateway-system.svc.cluster.local:11434
         - name: providers.ollama.model
-          value: gemma4:e4b
+          value: gemma4:26b
         - name: ui.service.type
           value: LoadBalancer
         - name: ui.service.ports.port
