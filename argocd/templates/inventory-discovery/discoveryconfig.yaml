@@ -1,0 +1,14 @@
+# Watches the local cluster for Kagent MCPServer / Agent / ModelConfig / RemoteMCPServer in namespace kagent.
+apiVersion: agentregistry.dev/v1alpha1
+kind: DiscoveryConfig
+metadata:
+  name: local-cluster
+  namespace: agentregistry
+spec:
+  environments:
+    - name: default
+      cluster:
+        name: local
+      discoveryEnabled: true
+      namespaces:
+        - kagent
