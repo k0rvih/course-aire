@@ -9,6 +9,5 @@ spec:
     - name: default
       cluster:
         name: local
+        useWorkloadIdentity: true
       discoveryEnabled: true
-      namespaces:
-        - kagent
