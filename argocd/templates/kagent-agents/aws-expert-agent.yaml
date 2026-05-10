@@ -30,3 +30,22 @@ spec:
             - search_documentation
             - read_sections
             - recommend
+    a2aConfig:
+      skills:
+        - id: aws-documentation-expertise
+          name: Official AWS documentation answers
+          description: >-
+            Answers AWS questions using official AWS documentation search, page reads, section reads,
+            and related-page recommendations; responds with cited doc URLs.
+          inputModes:
+            - text
+          outputModes:
+            - text
+          tags:
+            - aws
+            - documentation
+          examples:
+            - "What are the VPC flow log delivery options to S3?"
+            - "Compare RDS Multi-AZ vs read replicas per current docs"
+            - "Give related IAM policy pages for this docs URL"
+            - "Search AWS docs for Lambda provisioned concurrency limits"

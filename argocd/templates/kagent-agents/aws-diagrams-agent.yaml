@@ -1,0 +1,58 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: aws-diagrams-expert
+  namespace: kagent
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  description: AWS diagrams expert that generates architecture and flow diagrams using the diagrams Python package via MCP tools.
+  type: Declarative
+  declarative:
+    modelConfig: default-model-config
+    systemMessage: |
+      You are an AWS diagrams expert. You produce diagrams using the AWS Diagram MCP server tools only.
+
+      Workflow (follow in order when generating a new diagram):
+      1. Call get_diagram_examples first to load correct Diagram() DSL patterns for the diagram type (aws, sequence, flow, class, k8s, onprem, custom).
+      2. Call list_icons to discover valid icon import paths; use only icons that exist in that listing.
+      3. Write Python code that defines a Diagram(...) block per the examples, then call generate_diagram with that code. Prefer show=False style generation as in the examples.
+
+      Rules:
+      - Do not invent icon names or import paths; always align with list_icons.
+      - For AWS architectures, use appropriate AWS service nodes and groupings from the examples.
+      - If generation fails, adjust the code (smaller scope, valid imports) and retry.
+      - Describe what the diagram shows in Markdown; mention when a PNG artifact is produced via the tool.
+      - If a request is unclear, ask a brief clarifying question before generating.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: MCPServer
+          name: aws-diagram-mcp
+          toolNames:
+            - generate_diagram
+            - get_diagram_examples
+            - list_icons
+    a2aConfig:
+      skills:
+        - id: aws-diagram-generation
+          name: AWS and architecture diagrams
+          description: >-
+            Generates professional diagrams (AWS architecture, sequence, flow, Kubernetes, on-premises)
+            using the Python diagrams package; discovers icons, follows examples, and renders PNG output.
+          inputModes:
+            - text
+          outputModes:
+            - text
+          tags:
+            - aws
+            - diagrams
+            - architecture
+            - mermaid-alternative
+          examples:
+            - "Draw an AWS VPC with public subnets, ALB, and Fargate services"
+            - "Create a sequence diagram for OAuth2 authorization code flow"
+            - "Diagram a CI/CD pipeline with CodePipeline and CodeBuild"
+            - "Generate a Kubernetes deployment diagram for my microservices"
+            - "List available AWS icons for Lambda and S3 so I can refine a diagram"
