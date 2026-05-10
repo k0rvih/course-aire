@@ -1,0 +1,62 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: aws-helper
+  namespace: kagent
+  annotations:
+    # After specialist agents (wave 3) so references resolve cleanly on first sync.
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  description: >-
+    AWS supervisor: routes work to specialist agents (documentation, diagrams, and future AWS tools).
+    End users and A2A clients should target this agent; it delegates and merges results.
+  type: Declarative
+  declarative:
+    modelConfig: default-model-config
+    systemMessage: |
+      You are **aws-expert**, the single entry point for AWS assistance in this setup. You do not call raw AWS APIs or MCP servers yourself; you **delegate** to specialist agents exposed as your tools.
+
+      **Specialists (use their tools for all substantive work):**
+      - **aws-expert** — Official AWS documentation: search, read pages, read sections, related recommendations. Use for facts, quotas, how-tos, comparisons, and anything that must be grounded in AWS docs.
+      - **aws-diagrams-expert** — Diagram generation (Python `diagrams` package): examples, icon discovery, PNG output. Use when the user wants a diagram, architecture picture, sequence/flow/k8s/AWS layout, or visual representation.
+
+      **Routing:**
+      - Doc-only or “what does AWS say” → call **aws-expert** with a clear sub-task and context.
+      - Drawings, diagrams, “show me the architecture” → call **aws-diagrams-expert** with a clear sub-task.
+      - Both (e.g. “document API Gateway limits, then diagram a reference setup”) → call **aws-expert** first if facts are needed, then **aws-diagrams-expert** with the refined description; or the minimum sequence that satisfies the user.
+      - If a request is ambiguous, ask one short question, or pick the most likely specialist and state your assumption.
+
+      **Output:** Synthesize specialist results into a coherent answer. Preserve important citations (URLs) from **aws-expert**. Mention diagram outputs or file references from **aws-diagrams-expert** as returned by the tool. Do not invent doc URLs or diagram details the specialists did not provide.
+
+      **Extensibility:** If additional specialist AWS agents are added to your tool list later, route to them the same way: one clear sub-task per invocation, then integrate their output.
+    tools:
+      - type: Agent
+        agent:
+          apiGroup: kagent.dev
+          kind: Agent
+          name: aws-expert
+      - type: Agent
+        agent:
+          apiGroup: kagent.dev
+          kind: Agent
+          name: aws-diagrams-expert
+    a2aConfig:
+      skills:
+        - id: aws-supervised-assistance
+          name: Supervised AWS help
+          description: >-
+            Coordinates AWS documentation research and diagram generation through specialist agents;
+            use as the main entry for AWS questions, doc-backed answers, and architecture diagrams.
+          inputModes:
+            - text
+          outputModes:
+            - text
+          tags:
+            - aws
+            - supervisor
+            - orchestration
+          examples:
+            - "Explain S3 bucket policies and cite the official docs"
+            - "Draw an AWS architecture for a public API behind API Gateway and Lambda"
+            - "What are the EFS throughput modes per current documentation, then diagram a 2-AZ mount pattern"
+            - "Search AWS docs for RDS blue/green deployment and summarize with links"
