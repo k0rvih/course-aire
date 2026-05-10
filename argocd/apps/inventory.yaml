@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: inventory
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/den-vasyliev/agentregistry-inventory
+    targetRevision: main
+    path: charts/agentregistry
+    helm:
+      parameters:
+        - name: replicaCount
+          value: "2"
+        - name: controller.leaderElection
+          value: "true"
+        - name: httpApi.serviceType
+          value: LoadBalancer
+        - name: podDisruptionBudget.enabled
+          value: "true"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: agentregistry
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
