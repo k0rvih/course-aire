@@ -28,8 +28,6 @@ spec:
           value: "true"
         - name: governancePolicy.spec.requireHardenedDeployment
           value: "true"
-        - name: governancePolicy.spec.scoringWeights.hardenedDeployment
-          value: "15"
         - name: governancePolicy.spec.aiAgent.enabled
           value: "true"
         - name: governancePolicy.spec.aiAgent.provider
