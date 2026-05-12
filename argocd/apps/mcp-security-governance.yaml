@@ -42,6 +42,8 @@ spec:
           value: 30
         - name: governancePolicy.spec.requireTLS
           value: "true"
+        - name: governancePolicy.spec.requirePromptGuard
+          value: "true"
   destination:
     server: https://kubernetes.default.svc
     namespace: mcp-governance

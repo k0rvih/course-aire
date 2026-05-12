@@ -32,9 +32,7 @@ spec:
             type: PathPrefix
             value: /mcp/aws-diagram-mcp
       backendRefs:
-        - group: agentgateway.dev
-          kind: AgentgatewayBackend
-          name: aws-diagram-mcp
+        - name: aws-diagram-mcp
 ---
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayBackend
@@ -70,6 +68,4 @@ spec:
             type: PathPrefix
             value: /mcp/aws-documentation-mcp
       backendRefs:
-        - group: agentgateway.dev
-          kind: AgentgatewayBackend
-          name: aws-documentation-mcp
+        - name: aws-documentation-mcp
