@@ -40,6 +40,8 @@ spec:
           value: 10m
         - name: governancePolicy.spec.maxToolsCritical
           value: 30
+        - name: governancePolicy.spec.requireTLS
+          value: "true"
   destination:
     server: https://kubernetes.default.svc
     namespace: mcp-governance
