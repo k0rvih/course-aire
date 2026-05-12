@@ -12,8 +12,8 @@ spec:
     targetRevision: v0.22.2
     path: deploy/crds
     directory:
-      recurse: true
-      include: "*.yaml"
+      recurse: false
+      include: governance-crds.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: mcp-governance
