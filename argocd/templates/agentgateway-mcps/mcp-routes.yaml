@@ -1,0 +1,75 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: aws-diagram-mcp
+  namespace: agentgateway-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  mcp:
+    targets:
+      - name: aws-diagram-mcp
+        static:
+          host: aws-diagram-mcp.kagent.svc.cluster.local
+          port: 3000
+          path: /mcp
+          protocol: StreamableHTTP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: aws-diagram-mcp
+  namespace: agentgateway-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  parentRefs:
+    - name: agentgateway-proxy
+      namespace: agentgateway-system
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /mcp/aws-diagram-mcp
+      backendRefs:
+        - group: agentgateway.dev
+          kind: AgentgatewayBackend
+          name: aws-diagram-mcp
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: aws-documentation-mcp
+  namespace: agentgateway-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  mcp:
+    targets:
+      - name: aws-documentation-mcp
+        static:
+          host: aws-documentation-mcp.kagent.svc.cluster.local
+          port: 3000
+          path: /mcp
+          protocol: StreamableHTTP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: aws-documentation-mcp
+  namespace: agentgateway-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  parentRefs:
+    - name: agentgateway-proxy
+      namespace: agentgateway-system
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /mcp/aws-documentation-mcp
+      backendRefs:
+        - group: agentgateway.dev
+          kind: AgentgatewayBackend
+          name: aws-documentation-mcp
