@@ -37,6 +37,7 @@ spec:
         - group: agentgateway.dev
           kind: AgentgatewayBackend
           name: aws-diagram-mcp
+          weight: 1
 ---
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayBackend
@@ -77,3 +78,4 @@ spec:
         - group: agentgateway.dev
           kind: AgentgatewayBackend
           name: aws-documentation-mcp
+          weight: 1
