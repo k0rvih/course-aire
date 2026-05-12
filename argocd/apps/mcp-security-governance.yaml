@@ -38,6 +38,8 @@ spec:
           value: http://ollama.agentgateway-system.svc.cluster.local:11434
         - name: governancePolicy.spec.aiAgent.scanInterval
           value: 10m
+        - name: governancePolicy.spec.aiAgent.scanEnabled
+          value: true
         - name: governancePolicy.spec.maxToolsCritical
           value: 30
         - name: governancePolicy.spec.requireTLS
