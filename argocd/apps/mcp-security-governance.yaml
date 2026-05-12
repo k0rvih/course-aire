@@ -40,6 +40,8 @@ spec:
           value: http://ollama.agentgateway-system.svc.cluster.local:11434
         - name: governancePolicy.spec.aiAgent.scanInterval
           value: 10m
+        - name: governancePolicy.spec.maxToolsCritical
+          value: 30
   destination:
     server: https://kubernetes.default.svc
     namespace: mcp-governance
