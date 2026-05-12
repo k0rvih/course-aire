@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mcp-security-governance
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+spec:
+  project: default
+  source:
+    repoURL: ghcr.io/techwithhuz/charts
+    chart: mcp-governance
+    targetRevision: 0.22.2
+    helm:
+      skipCrds: false
+      parameters:
+        - name: createNamespace
+          value: "true"
+        - name: controller.image.pullPolicy
+          value: Always
+        - name: dashboard.image.pullPolicy
+          value: Always
+        - name: dashboard.service.type
+          value: LoadBalancer
+        - name: dashboard.service.nodePort
+          value: "null"
+        - name: samples.install
+          value: "true"
+        - name: governancePolicy.spec.requireHardenedDeployment
+          value: "true"
+        - name: governancePolicy.spec.scoringWeights.hardenedDeployment
+          value: "15"
+        - name: governancePolicy.spec.aiAgent.enabled
+          value: "true"
+        - name: governancePolicy.spec.aiAgent.provider
+          value: ollama
+        - name: governancePolicy.spec.aiAgent.model
+          value: gemma4:26b
+        - name: governancePolicy.spec.aiAgent.ollamaEndpoint
+          value: http://ollama.agentgateway-system.svc.cluster.local:11434
+        - name: governancePolicy.spec.aiAgent.scanInterval
+          value: 10m
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mcp-governance
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
