@@ -48,6 +48,22 @@ spec:
           value: "true"
         - name: governancePolicy.spec.requireJWTAuth
           value: "true"
+        - name: governancePolicy.spec.scoringWeights.agentGatewayIntegration
+          value: 25
+        - name: governancePolicy.spec.scoringWeights.authentication
+          value: 20
+        - name: governancePolicy.spec.scoringWeights.authorization
+          value: 15
+        - name: governancePolicy.spec.scoringWeights.corsPolicy
+          value: 10
+        - name: governancePolicy.spec.scoringWeights.tlsEncryption
+          value: 10
+        - name: governancePolicy.spec.scoringWeights.promptGuard
+          value: 5
+        - name: governancePolicy.spec.scoringWeights.rateLimit
+          value: 5
+        - name: governancePolicy.spec.scoringWeights.toolScope
+          value: 10
   destination:
     server: https://kubernetes.default.svc
     namespace: mcp-governance
