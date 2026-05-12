@@ -46,6 +46,8 @@ spec:
           value: "true"
         - name: governancePolicy.spec.requirePromptGuard
           value: "true"
+        - name: governancePolicy.spec.requireJWTAuth
+          value: "true"
   destination:
     server: https://kubernetes.default.svc
     namespace: mcp-governance
