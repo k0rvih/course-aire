@@ -12,7 +12,7 @@ spec:
     chart: mcp-governance
     targetRevision: 0.22.2
     helm:
-      skipCrds: false
+      skipCrds: true
       parameters:
         - name: createNamespace
           value: "true"
@@ -39,9 +39,9 @@ spec:
         - name: governancePolicy.spec.aiAgent.scanInterval
           value: 10m
         - name: governancePolicy.spec.aiAgent.scanEnabled
-          value: true
+          value: "true"
         - name: governancePolicy.spec.maxToolsCritical
-          value: 30
+          value: "30"
         - name: governancePolicy.spec.requireTLS
           value: "true"
         - name: governancePolicy.spec.requirePromptGuard
@@ -49,31 +49,31 @@ spec:
         - name: governancePolicy.spec.requireJWTAuth
           value: "true"
         - name: governancePolicy.spec.scoringWeights.agentGatewayIntegration
-          value: 25
+          value: "25"
         - name: governancePolicy.spec.scoringWeights.authentication
-          value: 20
+          value: "20"
         - name: governancePolicy.spec.scoringWeights.authorization
-          value: 15
+          value: "15"
         - name: governancePolicy.spec.scoringWeights.corsPolicy
-          value: 10
+          value: "10"
         - name: governancePolicy.spec.scoringWeights.tlsEncryption
-          value: 10
+          value: "10"
         - name: governancePolicy.spec.scoringWeights.promptGuard
-          value: 5
+          value: "5"
         - name: governancePolicy.spec.scoringWeights.rateLimit
-          value: 5
+          value: "5"
         - name: governancePolicy.spec.scoringWeights.toolScope
-          value: 10
+          value: "10"
         - name: governancePolicy.spec.verifiedCatalogScoring.securityWeight
-          value: 50
+          value: "50"
         - name: governancePolicy.spec.verifiedCatalogScoring.trustWeight
-          value: 30
+          value: "30"
         - name: governancePolicy.spec.verifiedCatalogScoring.complianceWeight
-          value: 20
+          value: "20"
         - name: governancePolicy.spec.verifiedCatalogScoring.verifiedThreshold
-          value: 70
+          value: "70"
         - name: governancePolicy.spec.verifiedCatalogScoring.unverifiedThreshold
-          value: 50
+          value: "50"
   destination:
     server: https://kubernetes.default.svc
     namespace: mcp-governance
