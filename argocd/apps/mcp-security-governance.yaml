@@ -64,6 +64,16 @@ spec:
           value: 5
         - name: governancePolicy.spec.scoringWeights.toolScope
           value: 10
+        - name: governancePolicy.spec.verifiedCatalogScoring.securityWeight
+          value: 50
+        - name: governancePolicy.spec.verifiedCatalogScoring.trustWeight
+          value: 30
+        - name: governancePolicy.spec.verifiedCatalogScoring.complianceWeight
+          value: 20
+        - name: governancePolicy.spec.verifiedCatalogScoring.verifiedThreshold
+          value: 70
+        - name: governancePolicy.spec.verifiedCatalogScoring.unverifiedThreshold
+          value: 50
   destination:
     server: https://kubernetes.default.svc
     namespace: mcp-governance
