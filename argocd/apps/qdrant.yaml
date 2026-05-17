@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: qdrant
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/qdrant/qdrant-helm
+    targetRevision: qdrant-1.18.0
+    path: charts/qdrant
+    helm:
+      parameters:
+        - name: replicaCount
+          value: "1"
+        - name: persistence.storageClassName
+          value: local-path
+        - name: persistence.size
+          value: 10Gi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: qdrant
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
