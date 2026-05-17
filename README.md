@@ -17,8 +17,10 @@ Materials for **AI Reliability Engineering**: a local Kubernetes lab on Oracle V
 | `argocd/app-of-apps.yaml` | Root Argo CD `Application` that syncs everything under `argocd/apps/` |
 | `argocd/apps/` | One `Application` manifest per component (sync waves order dependencies) |
 | `argocd/templates/` | Raw Kubernetes YAML consumed by those apps (e.g. local-path-provisioner, Ollama/Gateway wiring) |
-| `argocd/templates/kagent-mcps/` | kagent **`MCPServers`** CRs deployed into namespace `kagent` (kmcp controller) |
-| `argocd/templates/kagent-agents/` | Custom kagent **`Agents`** CRs in namespace `kagent` |
+| `argocd/templates/kagent-mcps/` | kagent **`MCPServer`** CRs in namespace `kagent` (AWS documentation and diagram servers) |
+| `argocd/templates/kagent-agents/` | Custom kagent **`Agent`** CRs in namespace `kagent` (specialists + **`aws-expert`** supervisor) |
+| `argocd/templates/agentgateway-mcps/` | **Agentgateway** `AgentgatewayBackend` + **HTTPRoute** for MCP exposure on the shared Gateway |
+| `argocd/templates/inventory-discovery/` | **Agentregistry** `DiscoveryConfig` — watches kagent CRs in `kagent` for inventory |
 
 ## What Vagrant installs (VM provisioning)
 
@@ -44,7 +46,7 @@ On the **master** only:
 
 Workers run the common script, then join via `join.sh` when it appears.
 
-**Not** installed by Vagrant: application charts, Gateway API CRDs as an Argo app, Agentgateway, kagent, local-path-provisioner, etc. Those are **Argo CD applications** (see below).
+**Not** installed by Vagrant: application charts, Gateway API CRDs, Agentgateway, kagent, agentregistry inventory, MCP governance, local-path-provisioner, etc. Those are **Argo CD applications** (see below).
 
 ## What Argo CD installs (GitOps)
 
@@ -59,8 +61,13 @@ The [app of apps](argocd/app-of-apps.yaml) points at this repo’s `argocd/apps`
 | `agentgateway-ollama` | 1 | **Gateway**, **HTTPRoute**, **AgentgatewayBackend**, and **Ollama** `Service` + **EndpointSlice** — traffic to Ollama is sent to **`192.168.56.1:11434`** (VirtualBox host; run Ollama on the host, not only inside a pod) |
 | `kagent-crds` | 2 | kagent CRDs (Helm from `ghcr.io/kagent-dev/kagent/helm`) |
 | `kagent` | 3 | **kagent** (default provider **Ollama** at `ollama.agentgateway-system.svc.cluster.local:11434`, model **gemma4:26b**; UI **LoadBalancer** on port 80) |
-| `kagent-mcps-servers` | 3 | Extra **MCP servers** for kagent: manifests in [`argocd/templates/kagent-mcps/`](argocd/templates/kagent-mcps/) — currently [AWS Documentation MCP Server](https://awslabs.github.io/mcp/servers/aws-documentation-mcp-server) as `MCPServer` **`aws-documentation-mcp`** (`uvx`, official AWS docs tools) |
-| `kagent-agents` | 3 | Custom **kagent agents**: manifests in [`argocd/templates/kagent-agents/`](argocd/templates/kagent-agents/) — **`aws-expert`** uses the AWS documentation MCP tools from **`aws-documentation-mcp`** |
+| `kagent-mcps-servers` | 3 | kagent **MCP servers** in [`argocd/templates/kagent-mcps/`](argocd/templates/kagent-mcps/): **`aws-documentation-mcp`** ([AWS docs](https://awslabs.github.io/mcp/servers/aws-documentation-mcp-server), `uvx`) and **`aws-diagram-mcp`** ([AWS diagrams](https://pypi.org/project/awslabs.aws-diagram-mcp-server/), `uvx`) |
+| `kagent-agents` | 3 | kagent **agents** in [`argocd/templates/kagent-agents/`](argocd/templates/kagent-agents/): **`aws-documentation-expert`**, **`aws-diagrams-expert`** (wave 3); **`aws-expert`** supervisor (wave 4, delegates to the specialists) |
+| `inventory` | 4 | [Agentregistry inventory](https://github.com/den-vasyliev/agentregistry-inventory) Helm chart — controller + **HTTP API** (`LoadBalancer`) in namespace `agentregistry` |
+| `agentgateway-mcps` | 4 | Routes MCP traffic through **Agentgateway**: [`argocd/templates/agentgateway-mcps/`](argocd/templates/agentgateway-mcps/) — backends to kagent MCP services at `/mcp/aws-documentation-mcp` and `/mcp/aws-diagram-mcp` |
+| `inventory-discovery` | 5 | **DiscoveryConfig** in [`argocd/templates/inventory-discovery/`](argocd/templates/inventory-discovery/) — discovers `MCPServer` / `Agent` / `ModelConfig` / `RemoteMCPServer` in `kagent` for the registry |
+| `mcp-security-governance-crds` | 5 | [MCP security governance](https://github.com/techwithhuz/mcp-security-governance) CRDs (`governance-crds.yaml`) in namespace `mcp-governance` |
+| `mcp-security-governance` | 6 | **MCP governance** controller + dashboard (Helm `mcp-governance` v0.22.2 from `ghcr.io/techwithhuz/charts`); dashboard **LoadBalancer**; policy uses lab **Ollama** (`gemma4:26b`) for AI-assisted scans |
 
 ## Prerequisites
 
@@ -153,7 +160,23 @@ kubectl get svc -n kagent
 
 Addresses should come from the same Cilium pool as other LB services (`192.168.56.20/28`).
 
-After **`kagent-agents`** syncs, the **aws-expert** agent appears in the kagent UI alongside the chart-bundled agents. The **AWS Documentation** MCP workload (`kagent-mcps-servers`) must be allowed **outbound HTTPS** so `uvx` can install the package and the server can call AWS documentation APIs.
+After **`kagent-agents`** syncs, **`aws-documentation-expert`**, **`aws-diagrams-expert`**, and the **`aws-expert`** supervisor appear in the kagent UI alongside chart-bundled agents. Use **`aws-expert`** as the main entry point; it delegates to the specialists.
+
+**MCP workloads** (`kagent-mcps-servers`) need **outbound HTTPS** so `uvx` can pull packages; diagram generation may also need extra resources on the node.
+
+**Agentregistry** (`inventory` + `inventory-discovery`): API on a Cilium **LoadBalancer** in `agentregistry`:
+
+```bash
+kubectl get svc -n agentregistry
+```
+
+**MCP governance dashboard** (`mcp-security-governance`):
+
+```bash
+kubectl get svc -n mcp-governance
+```
+
+**Agentgateway MCP paths** (after `agentgateway-mcps` syncs): HTTP routes under the shared Gateway proxy, e.g. `/mcp/aws-documentation-mcp` and `/mcp/aws-diagram-mcp` (see [`mcp-routes.yaml`](argocd/templates/agentgateway-mcps/mcp-routes.yaml)).
 
 ## Teardown
 
